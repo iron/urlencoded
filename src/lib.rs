@@ -33,13 +33,25 @@ impl UrlEncoded {
 }
 
 impl Middleware for UrlEncoded {
-    fn enter(&mut self, req: &mut Request, _ : &mut Response, alloy: &mut Alloy) -> Status {
 
-        let query = match url::path_from_str(req.url().unwrap().as_slice()) {
+    fn enter(&mut self, req: &mut Request, res: &mut Response, alloy: &mut Alloy) -> Status {
+
+        let raw_url = req.url();
+
+        let path = match raw_url {
+            Some(k) => {
+                url::path_from_str(k.as_slice())
+            },
+            None => {
+                return Continue;
+            }
+        };
+        
+        let query = match path {
             Ok(e) => {
                 e.query
             },
-            _ => {
+            Err(_) => {
                 return Continue;
             }
         };
@@ -49,6 +61,7 @@ impl Middleware for UrlEncoded {
 }
 
 fn create_hash(q: Vec<(String, String)>) -> HashMap<String, Vec<String>> {
+
     let mut hashStrVec: HashMap<String, Vec<String>> = HashMap::new();
  
     for (k, v) in q.move_iter() {
@@ -61,4 +74,14 @@ fn create_hash(q: Vec<(String, String)>) -> HashMap<String, Vec<String>> {
         );
     }
     hashStrVec
+}
+
+#[test]
+fn test_create_hash() {
+    let my_vec = vec!(("band".to_string(), "arctic monkeys".to_string()),("band".to_string(), "temper trap".to_string()),("color".to_string(),"green".to_string()));
+    let answer = create_hash(my_vec);
+    let mut control = HashMap::new();
+    control.insert("band".to_string(), vec!("arctic monkeys".to_string(), "temper trap".to_string()));
+    control.insert("color".to_string(), vec!("green".to_string()));
+    assert!(answer==control);
 }

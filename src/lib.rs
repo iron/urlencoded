@@ -28,9 +28,18 @@ impl UrlEncoded {
 impl Middleware for UrlEncoded {
     fn enter(&mut self, req: &mut Request, res: &mut Response, alloy: &mut Alloy) -> Status {
         
-        let raw_url = url::path_from_str(req.url().unwrap().as_slice());
+        let raw_url = req.url();
 
-        let query = match raw_url {
+        let path = match raw_url {
+            Some(k) => {
+                url::path_from_str(k.as_slice())
+            },
+            None => {
+                return Continue;
+            }
+        };
+        
+        let query = match path {
             Ok(e) => {
                 e.query
             },
@@ -38,7 +47,6 @@ impl Middleware for UrlEncoded {
                 return Continue;
             }
         };
-
         alloy.insert::<Encoded>(Encoded(vec_to_hashmap(query.clone())));
         Continue
     }

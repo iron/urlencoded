@@ -29,7 +29,7 @@ impl Middleware for UrlEncoded {
     fn enter(&mut self, req: &mut Request, res: &mut Response, alloy: &mut Alloy) -> Status {
         
         let raw_url = url::path_from_str(req.url().unwrap().as_slice());
-        
+
         let query = match raw_url {
             Ok(e) => {
                 e.query
@@ -39,16 +39,16 @@ impl Middleware for UrlEncoded {
             }
         };
 
-        alloy.insert::<Encoded>(Encoded(conv_string_vec(query)));
+        alloy.insert::<Encoded>(Encoded(vec_to_hashmap(query.clone())));
         Continue
     }
 }
 
-fn conv_string_vec(q: Vec<(String, String)>) -> HashMap<String, Vec<String>> {
-    let mut hashed_url: HashMap<String, Vec<String>> = HashMap::new();
+fn vec_to_hashmap(q: Vec<(String, String)>) -> HashMap<String, Vec<String>> {
+    let mut vec_hashmapped: HashMap<String, Vec<String>> = HashMap::new();
  
     for (k, v) in q.move_iter() {
-        hashed_url.find_with_or_insert_with(
+        vec_hashmapped.find_with_or_insert_with(
             k, v,
             |_, already, new| {
                 already.push(new);
@@ -56,5 +56,5 @@ fn conv_string_vec(q: Vec<(String, String)>) -> HashMap<String, Vec<String>> {
             |_, v| vec![v]
         );
     }
-    hashed_url
+    vec_hashmapped
 }

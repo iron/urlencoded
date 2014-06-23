@@ -13,8 +13,11 @@ use iron::middleware::{Status, Continue, Unwind};
 use url::from_str;
 use std::collections::HashMap;
 
+/// `urlencoded` returns a hashmap that maps a string to a Vec
+/// of strings. If there are two values assigned to the same key
+/// the user can ieterate through the Vec to access all data.
 #[deriving(Clone)]
-struct Encoded(HashMap<String, Vec<String>>);
+pub struct Encoded(pub HashMap<String, Vec<String>>);
 
 #[deriving(Clone)]
 pub struct UrlEncoded;
@@ -27,19 +30,8 @@ impl UrlEncoded {
 
 impl Middleware for UrlEncoded {
     fn enter(&mut self, req: &mut Request, res: &mut Response, alloy: &mut Alloy) -> Status {
-        
-        let raw_url = req.url();
 
-        let path = match raw_url {
-            Some(k) => {
-                url::path_from_str(k.as_slice())
-            },
-            None => {
-                return Continue;
-            }
-        };
-        
-        let query = match path {
+        let query = match url::path_from_str(req.url().unwrap().as_slice()) {
             Ok(e) => {
                 e.query
             },
@@ -47,16 +39,16 @@ impl Middleware for UrlEncoded {
                 return Continue;
             }
         };
-        alloy.insert::<Encoded>(Encoded(vec_to_hashmap(query.clone())));
+        alloy.insert::<Encoded>(Encoded(createHash(query)));
         Continue
     }
 }
 
-fn vec_to_hashmap(q: Vec<(String, String)>) -> HashMap<String, Vec<String>> {
-    let mut vec_hashmapped: HashMap<String, Vec<String>> = HashMap::new();
+fn createHash(q: Vec<(String, String)>) -> HashMap<String, Vec<String>> {
+    let mut hashStrVec: HashMap<String, Vec<String>> = HashMap::new();
  
     for (k, v) in q.move_iter() {
-        vec_hashmapped.find_with_or_insert_with(
+        hashStrVec.find_with_or_insert_with(
             k, v,
             |_, already, new| {
                 already.push(new);
@@ -64,5 +56,5 @@ fn vec_to_hashmap(q: Vec<(String, String)>) -> HashMap<String, Vec<String>> {
             |_, v| vec![v]
         );
     }
-    vec_hashmapped
+    hashStrVec
 }

@@ -13,9 +13,9 @@ use iron::middleware::{Status, Continue, Unwind};
 use url::from_str;
 use std::collections::HashMap;
 
-/// `urlencoded` returns a hashmap that maps a string to a Vec
-/// of strings. If there are two values assigned to the same key
-/// the user can ieterate through the Vec to access all data.
+/// `urlencoded` inserts a hashmap to an alloy for future access 
+/// The hashmap maps a string to a Vec of strings which stores 
+/// values from the url parameters including multiple entries for keys
 #[deriving(Clone)]
 pub struct Encoded(pub HashMap<String, Vec<String>>);
 

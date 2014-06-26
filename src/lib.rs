@@ -1,4 +1,6 @@
 //! Url Encoded middleware for Iron
+//! 
+//! This middleware focuses on parsing the incoming url parameters from client requests.
 #![crate_id = "urlencoded"]
 #![license = "MIT"]
 
@@ -13,15 +15,18 @@ use iron::middleware::{Status, Continue, Unwind};
 use url::from_str;
 use std::collections::HashMap;
 
-/// `urlencoded` inserts a hashmap to an alloy for future access 
-/// The hashmap maps a string to a Vec of strings which stores 
-/// values from the url parameters including multiple entries for keys
+/// Stores a `HashMap` of a `String` and a `Vec<Strings>` to address
+/// client data that is sent with multiple values for a single key.
 #[deriving(Clone)]
 pub struct Encoded(pub HashMap<String, Vec<String>>);
 
+/// This middleware is used for parsing url parameters and storing
+/// the data as conveniently accessible data `insert`ed into an Alloy. 
 #[deriving(Clone)]
 pub struct UrlEncoded;
 
+/// Creates a `UrlEncoded` instance to `link` to `server.chain`. Calling the
+/// function will `insert` a new `HashMap` into the `alloy`.
 impl UrlEncoded {
     pub fn new() -> UrlEncoded {
         UrlEncoded

@@ -1,0 +1,17 @@
+[package]
+
+name = "urlencoded"
+authors = ["Patrick Tran <patrick.tran06@gmail.com>"]
+version = "0.1.0"
+readme = "README.md"
+tags = ["web", "server", "middleware", "iron", "core", "urlencoded"]
+
+[[lib]]
+
+name = "urlencoded"
+path = "src/lib.rs"
+
+[dependencies.iron]
+
+git = "https://github.com/iron/iron.git"
+

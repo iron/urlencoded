@@ -12,7 +12,7 @@ use urlencoded::{UrlEncoded, Encoded};
 // Here we create a function to log the hashmap we are storing in Alloy.
 // Alloy is where your middleware can store data and we access it through
 // the `find` API exposed by alloy.
-fn log_hashmap(req: &mut Request, res: &mut Response, alloy: &mut Alloy) {
+fn log_hashmap( _ : &mut Request, _ : &mut Response, alloy: &mut Alloy) {
     let hashmap = alloy.find::<Encoded>();
     match hashmap {
         Some(&Encoded(ref encoded)) => println!("Url Encoded:\n {}", encoded),

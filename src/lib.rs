@@ -10,9 +10,8 @@ extern crate serialize;
 
 use iron::{Request, Response, Middleware, Alloy};
 use iron::mixin::GetUrl;
-use iron::middleware::{Status, Continue, Unwind};
+use iron::middleware::{Status, Continue};
 
-use url::from_str;
 use std::collections::HashMap;
 
 /// Stores a `HashMap` of a `String` and a `Vec<Strings>` to address
@@ -34,22 +33,22 @@ impl UrlEncoded {
 }
 
 impl Middleware for UrlEncoded {
-    fn enter(&mut self, req: &mut Request, res: &mut Response, alloy: &mut Alloy) -> Status {
+    fn enter(&mut self, req: &mut Request, _ : &mut Response, alloy: &mut Alloy) -> Status {
 
         let query = match url::path_from_str(req.url().unwrap().as_slice()) {
             Ok(e) => {
                 e.query
             },
-            Err(e) => {
+            _ => {
                 return Continue;
             }
         };
-        alloy.insert::<Encoded>(Encoded(createHash(query)));
+        alloy.insert::<Encoded>(Encoded(create_hash(query)));
         Continue
     }
 }
 
-fn createHash(q: Vec<(String, String)>) -> HashMap<String, Vec<String>> {
+fn create_hash(q: Vec<(String, String)>) -> HashMap<String, Vec<String>> {
     let mut hashStrVec: HashMap<String, Vec<String>> = HashMap::new();
  
     for (k, v) in q.move_iter() {

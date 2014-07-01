@@ -33,7 +33,7 @@ impl UrlEncoded {
 
 impl Middleware for UrlEncoded {
 
-    fn enter(&mut self, req: &mut Request, res: &mut Response, alloy: &mut Alloy) -> Status {
+    fn enter(&mut self, req: &mut Request, _ : &mut Response, alloy: &mut Alloy) -> Status {
 
         let raw_url = req.url();
 

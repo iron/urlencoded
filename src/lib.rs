@@ -8,9 +8,8 @@ extern crate url;
 extern crate iron;
 extern crate serialize;
 
-use iron::{Request, Response, Middleware, Alloy};
+use iron::{Request, Response, Middleware, Alloy, Status, Continue};
 use iron::mixin::GetUrl;
-use iron::middleware::{Status, Continue};
 
 use std::collections::HashMap;
 

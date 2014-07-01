@@ -4,9 +4,7 @@ extern crate urlencoded;
 
 use std::io::net::ip::Ipv4Addr;
 
-use iron::{Iron, ServerT, Request, Response, Alloy, Chain};
-use iron::middleware::{Status, Continue, FromFn};
-
+use iron::{Iron, Server, Request, Response, Alloy, Chain, Status, Continue, FromFn};
 use urlencoded::{UrlEncoded, Encoded};
 
 // urlencoded returns a Hashmap 

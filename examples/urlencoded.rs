@@ -4,9 +4,7 @@ extern crate urlencoded;
 
 use std::io::net::ip::Ipv4Addr;
 
-use iron::{Iron, ServerT, Request, Response, Alloy, Chain};
-use iron::middleware::{Status, Continue, FromFn};
-
+use iron::{Iron, Server, Request, Response, Alloy, Chain, Status, Continue, FromFn};
 use urlencoded::{UrlEncoded, Encoded};
 
 // urlencoded returns a Hashmap 
@@ -24,7 +22,7 @@ fn log_hashmap( _ : &mut Request, _ : &mut Response, alloy: &mut Alloy) -> Statu
 
 // test out the server with `curl -i "127.0.0.1:3000/?name=franklin&name=trevor"`
 fn main() {
-    let mut server: ServerT = Iron::new();
+    let mut server: Server = Iron::new();
     server.chain.link(UrlEncoded::new());
     server.chain.link(FromFn::new(log_hashmap));
     server.listen(Ipv4Addr(127, 0, 0, 1), 3000);

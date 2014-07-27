@@ -11,22 +11,23 @@ extern crate urlencoded;
 
 use std::io::net::ip::Ipv4Addr;
 
-use iron::{Iron, Server, Request, Response, Alloy, Chain};
+use iron::{Iron, Server, Request, Response, Alloy, Chain, Status, Continue, FromFn};
 
 use urlencoded::{UrlEncoded, Encoded};
 
-fn log_hashmap( _ : &mut Request, _ : &mut Response, alloy: &mut Alloy) {
+fn log_hashmap( _ : &mut Request, _ : &mut Response, alloy: &mut Alloy) -> Status {
     let hashmap = alloy.find::<Encoded>();
     match hashmap {
         Some(&Encoded(ref encoded)) => println!("Url Encoded:\n {}", encoded),
         None => ()
     }
+    Continue
 }
 
 fn main() {
     let mut server: Server = Iron::new();
     server.chain.link(UrlEncoded::new());
-    server.chain.link(log_hashmap);
+    server.chain.link(FromFn::new(log_hashmap));
     server.listen(Ipv4Addr(127, 0, 0, 1), 3000);
 }
 ```

@@ -1,10 +1,9 @@
 [package]
 
 name = "urlencoded"
-authors = ["Patrick Tran <patrick.tran06@gmail.com>"]
+authors = ["Patrick Tran <patrick.tran06@gmail.com>",
+           "Jonathan Reem <jonathan.reem@gmail.com>"]
 version = "0.1.0"
-readme = "README.md"
-tags = ["web", "server", "middleware", "iron", "core", "urlencoded"]
 
 [[lib]]
 

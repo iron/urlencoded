@@ -1,87 +1,75 @@
 #![doc(html_logo_url = "https://avatars0.githubusercontent.com/u/7853871?s=128", html_favicon_url = "https://avatars0.githubusercontent.com/u/7853871?s=256", html_root_url = "http://ironframework.io/core/urlencoded")]
-//! Url Encoded middleware for Iron
-//! 
-//! This middleware focuses on parsing the incoming url parameters from client requests.
-#![crate_id = "urlencoded"]
 #![license = "MIT"]
+
+//! Url Encoded middleware for Iron
+//!
+//! Parses url parameters from client requests.
 
 extern crate url;
 extern crate iron;
 extern crate serialize;
 
 use iron::{Request, Response, Middleware, Alloy, Status, Continue};
-use iron::mixin::GetUrl;
 
 use std::collections::HashMap;
 
-/// Stores a `HashMap` of a `String` and a `Vec<Strings>` to address
-/// client data that is sent with multiple values for a single key.
+/// Stores decoded key-value pairs.
+///
+/// Multiple assignment as in `?a=b&a=c` is stored
+/// as `a => vec![b, c]`
 #[deriving(Clone)]
 pub struct Encoded(pub HashMap<String, Vec<String>>);
 
 /// This middleware is used for parsing url parameters and storing
-/// the data as conveniently accessible data `insert`ed into an Alloy. 
+/// the data as conveniently accessible data `insert`ed into an Alloy.
 #[deriving(Clone)]
 pub struct UrlEncoded;
 
-/// Creates a `UrlEncoded` instance to `link` to `server.chain`. Calling the
-/// function will `insert` a new `HashMap` into the `alloy`.
+/// Creates a `UrlEncoded` decoder
 impl UrlEncoded {
-    pub fn new() -> UrlEncoded {
-        UrlEncoded
-    }
+    pub fn new() -> UrlEncoded { UrlEncoded }
 }
 
 impl Middleware for UrlEncoded {
 
     fn enter(&mut self, req: &mut Request, _ : &mut Response, alloy: &mut Alloy) -> Status {
-
-        let raw_url = req.url();
-
-        let path = match raw_url {
-            Some(k) => {
-                url::path_from_str(k.as_slice())
+        match url::path_from_str(req.url.as_slice()) {
+            Ok(parsed) => {
+                alloy.insert::<Encoded>(Encoded(combine_duplicates(parsed.query)));
+                Continue
             },
-            None => {
-                return Continue;
-            }
-        };
-        
-        let query = match path {
-            Ok(e) => {
-                e.query
-            },
-            Err(_) => {
-                return Continue;
-            }
-        };
-        alloy.insert::<Encoded>(Encoded(create_hash(query)));
-        Continue
+            _ => Continue
+        }
     }
 }
 
-fn create_hash(q: Vec<(String, String)>) -> HashMap<String, Vec<String>> {
+fn combine_duplicates(q: Vec<(String, String)>) -> HashMap<String, Vec<String>> {
 
-    let mut hashStrVec: HashMap<String, Vec<String>> = HashMap::new();
- 
+    let mut deduplicated: HashMap<String, Vec<String>> = HashMap::new();
+
     for (k, v) in q.move_iter() {
-        hashStrVec.find_with_or_insert_with(
+        deduplicated.find_with_or_insert_with(
             k, v,
-            |_, already, new| {
-                already.push(new);
-            },
+            // Already a Vec here, push onto it
+            |_, already, new| { already.push(new); },
+            // No value, create a one-element Vec.
             |_, v| vec![v]
         );
     }
-    hashStrVec
+
+    deduplicated
 }
 
 #[test]
-fn test_create_hash() {
-    let my_vec = vec!(("band".to_string(), "arctic monkeys".to_string()),("band".to_string(), "temper trap".to_string()),("color".to_string(),"green".to_string()));
-    let answer = create_hash(my_vec);
+fn test_combine_duplicates() {
+    let my_vec = vec!(("band".to_string(), "arctic monkeys".to_string()),
+                      ("band".to_string(), "temper trap".to_string()),
+                      ("color".to_string(),"green".to_string()));
+    let answer = combine_duplicates(my_vec);
     let mut control = HashMap::new();
-    control.insert("band".to_string(), vec!("arctic monkeys".to_string(), "temper trap".to_string()));
+    control.insert("band".to_string(),
+                   vec!("arctic monkeys".to_string(), "temper trap".to_string()));
     control.insert("color".to_string(), vec!("green".to_string()));
-    assert!(answer==control);
+    assert_eq!(answer, control);
 }
+

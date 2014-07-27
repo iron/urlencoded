@@ -1,9 +1,12 @@
 urlencoded [![Build Status](https://secure.travis-ci.org/iron/urlencoded.png?branch=master)](https://travis-ci.org/iron/urlencoded)
 ====
 
-> URL Encoded middleware for the [Iron](https://github.com/iron/iron) web framework.
+> URL Encoded middleware for the [Iron](https://github.com/iron/iron) web framework.  
+> Decode URL Encoded data from GET request queries and POST request bodies.
 
 ## Example
+
+This example shows how to use urlencoded to parse GET request parameters.
 
 ```rust
 extern crate iron;
@@ -12,22 +15,30 @@ extern crate urlencoded;
 use std::io::net::ip::Ipv4Addr;
 
 use iron::{Iron, Server, Request, Response, Alloy, Chain, Status, Continue, FromFn};
+use urlencoded::{UrlEncodedParser, UrlEncodedData};
 
-use urlencoded::{UrlEncoded, Encoded};
+// The UrlEncodedParser middleware inserts a UrlEncodedData object into the Alloy.
+// The .query_string field of the UrlEncodedData object contains an optional hashmap
+// which maps values from the URL's query string onto a vector of values.
+// This function prints this hashmap to the console.
+fn log_params(_ : &mut Request, _ : &mut Response, alloy: &mut Alloy) -> Status {
+    // Extract the parsed data (this always succeeds, because something is always inserted).
+    let data = alloy.find::<UrlEncodedData>().unwrap();
 
-fn log_hashmap( _ : &mut Request, _ : &mut Response, alloy: &mut Alloy) -> Status {
-    let hashmap = alloy.find::<Encoded>();
-    match hashmap {
-        Some(&Encoded(ref encoded)) => println!("Url Encoded:\n {}", encoded),
-        None => ()
+    // Extract the relevant hashmap from the parsed data.
+    match data.query_string {
+        Some(ref hashmap) => println!("Parsed GET request query string:\n {}", hashmap),
+        None => println!("Error, no query string found")
     }
+
     Continue
 }
 
+// Test out the server with `curl -i "http://localhost:3000/?name=franklin&name=trevor"`
 fn main() {
     let mut server: Server = Iron::new();
-    server.chain.link(UrlEncoded::new());
-    server.chain.link(FromFn::new(log_hashmap));
+    server.chain.link(UrlEncodedParser::url_only());
+    server.chain.link(FromFn::new(log_params));
     server.listen(Ipv4Addr(127, 0, 0, 1), 3000);
 }
 ```
@@ -36,10 +47,11 @@ fn main() {
 
 urlencoded is a part of Iron's [core bundle](https://github.com/iron/core).
 
-- Handles url parsing and parses parameters after the `?` into a `HashMap` that maps
-`String` representations of keys into a `Vector` of `String` values.
-- Values are populated into a `Vector` to ensure that multiple values which are passed
-into the url are also stored and assessible. 
+- Parses a URL query string into a `HashMap`s that maps `String` representations
+of keys onto a `Vec` of `String` values.
+- Values are stored in a `Vec` to ensure that no information is lost if a key appears multiple times.
+The query string `a=b&a=c` will result in a mapping from `a` to `[b, c]`.
+- Parses POST request bodies for web form data (MIME type: `application/x-www-form-urlencoded`).
 
 ## Installation
 

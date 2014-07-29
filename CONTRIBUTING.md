@@ -1,11 +1,11 @@
 # Contributing
 
-**middleware-seed** uses the same conventions as **[Iron](https://github.com/iron/iron)**.
+**urlencoded** uses the same conventions as **[Iron](https://github.com/iron/iron)**.
 
 ### Overview
 
-* Fork middleware-seed to your own account
-* Create a feature branch, namespaced by.
+* Fork urlencoded to your own account
+* Create a feature branch, namespaced by:
   * bug/...
   * feat/...
   * test/...

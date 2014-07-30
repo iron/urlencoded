@@ -7,7 +7,7 @@
 //! Capable of parsing both URL query strings and POST request bodies.
 
 // Use rust-url over soon to be deprecated liburl
-extern crate url = "url_";
+extern crate url;
 extern crate iron;
 extern crate serialize;
 

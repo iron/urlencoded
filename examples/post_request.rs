@@ -2,13 +2,13 @@
 extern crate iron;
 extern crate urlencoded;
 
-use iron::{Iron, Server, Chain, Request, Response, Alloy, FromFn};
+use iron::{Iron, Server, Chain, Request, Response, FromFn};
 use iron::{Status, Continue};
 use urlencoded::{UrlEncodedParser, UrlEncodedData};
 use std::io::net::ip::Ipv4Addr;
 
-fn log_post_data(_: &mut Request, _: &mut Response, alloy: &mut Alloy) -> Status {
-    let data = alloy.find::<UrlEncodedData>().unwrap();
+fn log_post_data(req: &mut Request, _: &mut Response) -> Status {
+    let data = req.alloy.find::<UrlEncodedData>().unwrap();
 
     match data.body {
         Some(ref hashmap) => println!("Parsed POST request body:\n {}", hashmap),

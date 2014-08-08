@@ -11,7 +11,7 @@ extern crate url;
 extern crate iron;
 extern crate serialize;
 
-use iron::{Request, Response, Middleware, Alloy, Status, Continue};
+use iron::{Request, Response, Middleware, Status, Continue};
 
 use url::form_urlencoded;
 use std::collections::HashMap;
@@ -66,18 +66,12 @@ impl UrlEncodedParser {
 }
 
 impl Middleware for UrlEncodedParser {
-    fn enter(&mut self, req: &mut Request, _ : &mut Response, alloy: &mut Alloy) -> Status {
+    fn enter(&mut self, req: &mut Request, _ : &mut Response) -> Status {
         let mut result = UrlEncodedData { query_string: None, body: None };
 
         // Parse the url's query string from the '?' characters onwards, if desired.
-        // XXX: Fix this when Request is updated (use url::Url::query)
         if self.parse_url {
-            let data = match req.url.as_slice().find('?') {
-                Some(i) => req.url.as_slice().slice_from(i + 1),
-                None => ""
-            };
-
-            result.query_string = create_param_hashmap(data);
+            result.query_string = req.url.query_pairs().map(combine_duplicates);
         }
 
         // Parse the request's body if desired
@@ -86,7 +80,7 @@ impl Middleware for UrlEncodedParser {
         }
 
         // Insert the result into the Alloy
-        alloy.insert::<UrlEncodedData>(result);
+        req.alloy.insert::<UrlEncodedData>(result);
 
         Continue
     }

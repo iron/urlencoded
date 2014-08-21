@@ -1,92 +1,61 @@
 #![doc(html_logo_url = "https://avatars0.githubusercontent.com/u/7853871?s=128", html_favicon_url = "https://avatars0.githubusercontent.com/u/7853871?s=256", html_root_url = "http://ironframework.io/core/urlencoded")]
 #![license = "MIT"]
 
-//! Url Encoded middleware for Iron.
+#![feature(default_type_params)]
+
+//! URL Encoded Plugin for Iron.
 //!
 //! Parses "url encoded" data from client requests.
 //! Capable of parsing both URL query strings and POST request bodies.
 
-// Use rust-url over soon to be deprecated liburl
-extern crate url;
 extern crate iron;
+extern crate url;
 extern crate serialize;
 
-use iron::{Request, Response, Middleware, Status, Continue};
+extern crate plugin;
+extern crate typemap;
+
+use iron::Request;
 
 use url::form_urlencoded;
 use std::collections::HashMap;
 
-/// Stores data extracted from the query string and body of a request in a pair of hashmaps.
+use plugin::{PluginFor, Phantom};
+use typemap::Assoc;
+
+/// Plugin for `Request` that extracts URL encoded data from the URL query string.
 ///
-/// Each map is `Some` only if both of the following conditions are met:
-///     1. Parsing of the field is enabled in the `UrlEncodedParser`.
-///     2. The query string/body of the request is non-empty.
+/// Use it like this: `req.get_ref::<UrlEncodedQuery>()`
+pub struct UrlEncodedQuery;
+
+/// Plugin for `Request` that extracts URL encoded data from the request body.
 ///
-/// The values are stored in a vector so that keys which appear multiple times can map to
-/// multple values.
-/// e.g. "?a=b&a=c" is stored as `a => vec![b, c]`
-#[deriving(Clone)]
-pub struct UrlEncodedData {
-    // HashMap created from URL query string.
-    pub query_string: Option<HashMap<String, Vec<String>>>,
+/// Use it like this: `req.get_ref::<UrlEncodedBody>()`
+pub struct UrlEncodedBody;
 
-    // HashMap created from request body.
-    pub body: Option<HashMap<String, Vec<String>>>
-}
+/// Hashmap mapping strings to vectors of strings.
+pub type QueryMap = HashMap<String, Vec<String>>;
 
-/// Middleware which inserts a `UrlEncodedData` object into the alloy for later use.
-///
-/// Can be configured to parse the request's URL, body or both. Always inserts something.
-#[deriving(Clone)]
-pub struct UrlEncodedParser {
-    parse_url: bool,
-    parse_body: bool
-}
+impl Assoc<QueryMap> for UrlEncodedQuery {}
+impl Assoc<QueryMap> for UrlEncodedBody {}
 
-impl UrlEncodedParser {
-    /// Creates a `UrlEncodedParser` which operates on both the URL and body
-    /// of a Request. This is less efficient than using `url_only` or `body_only`.
-    pub fn new() -> UrlEncodedParser {
-        UrlEncodedParser { parse_url: true, parse_body: true }
-    }
-
-    /// Creates a `UrlEncodedParser` which operates on the `url` field of a `Request`.
-    ///
-    /// Useful for parsing GET request query strings.
-    pub fn url_only() -> UrlEncodedParser {
-        UrlEncodedParser { parse_url: true, parse_body: false }
-    }
-
-    /// Creates a `UrlEncodedParser` which operates on the `body` field of a `Request`.
-    ///
-    /// Useful for parsing the bodies of POST requests.
-    pub fn body_only() -> UrlEncodedParser {
-        UrlEncodedParser { parse_url: false, parse_body: true }
-    }
-}
-
-impl Middleware for UrlEncodedParser {
-    fn enter(&mut self, req: &mut Request, _ : &mut Response) -> Status {
-        let mut result = UrlEncodedData { query_string: None, body: None };
-
-        // Parse the url's query string from the '?' characters onwards, if desired.
-        if self.parse_url {
-            result.query_string = req.url.query_pairs().map(combine_duplicates);
+impl PluginFor<Request, QueryMap> for UrlEncodedQuery {
+    fn eval(req: &Request, _: Phantom<UrlEncodedQuery>) -> Option<QueryMap> {
+        match req.url.query {
+            Some(ref query) => create_param_hashmap(query.as_slice()),
+            None => None
         }
-
-        // Parse the request's body if desired
-        if self.parse_body {
-            result.body = create_param_hashmap(req.body.as_slice());
-        }
-
-        // Insert the result into the Alloy
-        req.alloy.insert::<UrlEncodedData>(result);
-
-        Continue
     }
 }
 
-/// Parses a urlencoded string into an optional HashMap.
+
+impl PluginFor<Request, HashMap<String, Vec<String>>> for UrlEncodedBody {
+    fn eval(req: &Request, _: Phantom<UrlEncodedBody>) -> Option<QueryMap> {
+        create_param_hashmap(req.body.as_slice())
+    }
+}
+
+/// Parse a urlencoded string into an optional HashMap.
 fn create_param_hashmap(data: &str) -> Option<HashMap<String, Vec<String>>> {
     match data {
         "" => None,
@@ -94,6 +63,7 @@ fn create_param_hashmap(data: &str) -> Option<HashMap<String, Vec<String>>> {
     }
 }
 
+/// Convert a list of (key, value) pairs into a hashmap with vector values.
 fn combine_duplicates(q: Vec<(String, String)>) -> HashMap<String, Vec<String>> {
 
     let mut deduplicated: HashMap<String, Vec<String>> = HashMap::new();

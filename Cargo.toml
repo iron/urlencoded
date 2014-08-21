@@ -3,9 +3,10 @@
 name = "urlencoded"
 version = "0.1.0"
 authors = ["Patrick Tran <patrick.tran06@gmail.com>",
-           "Jonathan Reem <jonathan.reem@gmail.com>"]
+           "Jonathan Reem <jonathan.reem@gmail.com>",
+           "Michael Sproul <micsproul@gmail.com>"]
 
-[[lib]]
+[lib]
 
 name = "urlencoded"
 path = "src/lib.rs"
@@ -17,3 +18,11 @@ git = "https://github.com/iron/iron.git"
 [dependencies.url]
 
 git = "https://github.com/servo/rust-url.git"
+
+[dependencies.typemap]
+
+git = "https://github.com/reem/rust-typemap.git"
+
+[dependencies.plugin]
+
+git = "https://github.com/reem/rust-plugin.git"

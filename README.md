@@ -58,9 +58,9 @@ git = "https://github.com/iron/urlencoded.git"
 
 Otherwise, `cargo build`, and the rlib will be in your `target` directory.
 
-## [Documentation](http://docs.ironframework.io/urlencoded)
+## [Documentation](http://ironframework.io/doc/urlencoded)
 
-Along with the [online documentation](http://docs.ironframework.io/urlencoded),
+Along with the [online documentation](http://ironframework.io/doc/urlencoded),
 you can build a local copy with `cargo doc`.
 
 ## [Examples](/examples)

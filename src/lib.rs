@@ -18,7 +18,7 @@ extern crate typemap;
 use iron::Request;
 
 use url::form_urlencoded;
-use std::collections::hashmap::{HashMap, Occupied, Vacant};
+use std::collections::hash_map::{HashMap, Occupied, Vacant};
 use std::str;
 
 use plugin::{PluginFor, Phantom};

@@ -18,7 +18,8 @@ extern crate typemap;
 use iron::Request;
 
 use url::form_urlencoded;
-use std::collections::HashMap;
+use std::collections::hashmap::{HashMap, Occupied, Vacant};
+use std::str;
 
 use plugin::{PluginFor, Phantom};
 use typemap::Assoc;
@@ -40,7 +41,7 @@ impl Assoc<QueryMap> for UrlEncodedQuery {}
 impl Assoc<QueryMap> for UrlEncodedBody {}
 
 impl PluginFor<Request, QueryMap> for UrlEncodedQuery {
-    fn eval(req: &Request, _: Phantom<UrlEncodedQuery>) -> Option<QueryMap> {
+    fn eval(req: &mut Request, _: Phantom<UrlEncodedQuery>) -> Option<QueryMap> {
         match req.url.query {
             Some(ref query) => create_param_hashmap(query.as_slice()),
             None => None
@@ -50,8 +51,8 @@ impl PluginFor<Request, QueryMap> for UrlEncodedQuery {
 
 
 impl PluginFor<Request, HashMap<String, Vec<String>>> for UrlEncodedBody {
-    fn eval(req: &Request, _: Phantom<UrlEncodedBody>) -> Option<QueryMap> {
-        create_param_hashmap(req.body.as_slice())
+    fn eval(req: &mut Request, _: Phantom<UrlEncodedBody>) -> Option<QueryMap> {
+        str::from_utf8(req.body.as_slice()).and_then(create_param_hashmap)
     }
 }
 
@@ -68,14 +69,14 @@ fn combine_duplicates(q: Vec<(String, String)>) -> HashMap<String, Vec<String>> 
 
     let mut deduplicated: HashMap<String, Vec<String>> = HashMap::new();
 
-    for (k, v) in q.move_iter() {
-        deduplicated.find_with_or_insert_with(
-            k, v,
+    for (k, v) in q.into_iter() {
+        match deduplicated.entry(k) {
             // Already a Vec here, push onto it
-            |_, already, new| { already.push(new); },
+            Occupied(entry) => { entry.into_mut().push(v); },
+
             // No value, create a one-element Vec.
-            |_, v| vec![v]
-        );
+            Vacant(entry) => { entry.set(vec![v]); }
+        };
     }
 
     deduplicated

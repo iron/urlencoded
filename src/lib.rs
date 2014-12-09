@@ -1,5 +1,4 @@
 #![crate_name = "urlencoded"]
-#![license = "MIT"]
 
 #![feature(default_type_params)]
 

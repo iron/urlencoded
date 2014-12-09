@@ -20,5 +20,5 @@ fn log_params(req: &mut Request) -> IronResult<Response> {
 
 // Test out the server with `curl -i "http://localhost:3000/?name=franklin&name=trevor"`
 fn main() {
-    Iron::new(log_params).listen(Ipv4Addr(127, 0, 0, 1), 3000);
+    Iron::new(log_params).listen((Ipv4Addr(127, 0, 0, 1), 3000)).unwrap();
 }

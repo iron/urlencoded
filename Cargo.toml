@@ -1,19 +1,19 @@
 [package]
 
 name = "urlencoded"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Patrick Tran <patrick.tran06@gmail.com>",
            "Jonathan Reem <jonathan.reem@gmail.com>",
            "Michael Sproul <micsproul@gmail.com>"]
-
-[lib]
-
-name = "urlencoded"
-path = "src/lib.rs"
+readme = "README.md"
+repository = "https://github.com/iron/urlencoded"
+documentation = "http://ironframework.io/doc/urlencoded/"
+description = "Decoding middleware for url-encoded data. For use with Iron."
+license = "MIT"
 
 [dependencies]
 iron = "*"
 url = "*"
-typemap = "*"
 plugin = "*"
 bodyparser = "*"
+

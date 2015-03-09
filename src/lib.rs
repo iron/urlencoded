@@ -9,7 +9,7 @@ extern crate bodyparser;
 extern crate url;
 extern crate plugin;
 
-use iron::Request;
+use iron::prelude::*;
 use iron::typemap::Key;
 
 use plugin::Pluggable;

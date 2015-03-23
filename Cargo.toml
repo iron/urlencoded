@@ -1,7 +1,7 @@
 [package]
 
 name = "urlencoded"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Patrick Tran <patrick.tran06@gmail.com>",
            "Jonathan Reem <jonathan.reem@gmail.com>",
            "Michael Sproul <micsproul@gmail.com>"]

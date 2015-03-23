@@ -44,12 +44,11 @@ The query string `a=b&a=c` will result in a mapping from `a` to `[b, c]`.
 
 ## Installation
 
-If you're using a `Cargo` to manage dependencies, just add urlencoded to the toml:
+If you're using `Cargo` to manage dependencies, just add urlencoded to `Cargo.toml`:
 
 ```toml
 [dependencies.urlencoded]
-
-git = "https://github.com/iron/urlencoded.git"
+version = "*"
 ```
 
 Otherwise, `cargo build`, and the rlib will be in your `target` directory.

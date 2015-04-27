@@ -1,4 +1,3 @@
-#![feature(core, std_misc)]
 //! URL Encoded Plugin for Iron.
 //!
 //! Parses "url encoded" data from client requests.
@@ -37,13 +36,14 @@ pub struct UrlEncodedBody;
 ///
 /// The second type of error that can occur is that something goes wrong
 /// when parsing the request body.
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub enum UrlDecodingError{
     /// An error parsing the request body
     BodyError(bodyparser::BodyError),
     /// An empty query string, either in body or url query
     EmptyQuery
 }
+
 pub use UrlDecodingError::*;
 
 impl fmt::Display for UrlDecodingError {

@@ -10,6 +10,7 @@ repository = "https://github.com/iron/urlencoded"
 documentation = "http://ironframework.io/doc/urlencoded/"
 description = "Decoding middleware for url-encoded data. For use with Iron."
 license = "MIT"
+keywords = ["iron", "web", "url", "encoding"]
 
 [dependencies]
 iron = "*"

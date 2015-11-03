@@ -13,8 +13,8 @@ license = "MIT"
 keywords = ["iron", "web", "url", "encoding"]
 
 [dependencies]
-iron = "*"
-url = "*"
-plugin = "*"
-bodyparser = "*"
+iron = { version = "0.2", default-features = false }
+url = "0.2"
+plugin = "0.2"
+bodyparser = "0"
 

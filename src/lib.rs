@@ -84,7 +84,7 @@ impl<'a, 'b> plugin::Plugin<Request<'a, 'b>> for UrlEncodedQuery {
     type Error = UrlDecodingError;
 
     fn eval(req: &mut Request) -> QueryResult {
-        match req.url.query {
+        match req.url.query() {
             Some(ref query) => create_param_hashmap(&query),
             None => Err(UrlDecodingError::EmptyQuery)
         }

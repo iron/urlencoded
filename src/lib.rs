@@ -56,7 +56,7 @@ impl StdError for UrlDecodingError {
     fn description(&self) -> &str {
         match *self {
             BodyError(ref err) => err.description(),
-            EmptyQuery => "Expected query, found empty string."
+            EmptyQuery => "Expected query, found empty string"
         }
     }
 

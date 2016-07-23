@@ -11,8 +11,6 @@ extern crate plugin;
 use iron::prelude::*;
 use iron::typemap::Key;
 
-use plugin::Pluggable;
-
 use url::form_urlencoded;
 use std::collections::HashMap;
 use std::collections::hash_map::Entry::*;

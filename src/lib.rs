@@ -104,15 +104,15 @@ impl<'a, 'b> plugin::Plugin<Request<'a, 'b>> for UrlEncodedBody {
 fn create_param_hashmap(data: &str) -> QueryResult {
     match data {
         "" => Err(UrlDecodingError::EmptyQuery),
-        _ => Ok(combine_duplicates(form_urlencoded::parse(data.as_bytes())))
+        _ => Ok(combine_duplicates(form_urlencoded::parse(data.as_bytes()).into_owned()))
     }
 }
 
 /// Convert a list of (key, value) pairs into a hashmap with vector values.
-fn combine_duplicates(q: Vec<(String, String)>) -> QueryMap {
+fn combine_duplicates<I: Iterator<Item=(String, String)>>(collection: I) -> QueryMap {
     let mut deduplicated: QueryMap = HashMap::new();
 
-    for (k, v) in q.into_iter() {
+    for (k, v) in collection {
         match deduplicated.entry(k) {
             // Already a Vec here, push onto it
             Occupied(entry) => { entry.into_mut().push(v); },
@@ -130,7 +130,7 @@ fn test_combine_duplicates() {
     let my_vec = vec![("band".to_string(), "arctic monkeys".to_string()),
                       ("band".to_string(), "temper trap".to_string()),
                       ("color".to_string(),"green".to_string())];
-    let answer = combine_duplicates(my_vec);
+    let answer = combine_duplicates(my_vec.into_iter());
     let mut control = HashMap::new();
     control.insert("band".to_string(),
                    vec!["arctic monkeys".to_string(), "temper trap".to_string()]);

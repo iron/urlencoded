@@ -3,5 +3,5 @@ rust:
     - stable
     - beta
     - nightly
-after_success: 'curl https://raw.githubusercontent.com/iron-bot/build-doc/master/build-doc.sh
+after_success: 'curl https://raw.githubusercontent.com/iron/build-doc/master/build-doc.sh
   | sh '

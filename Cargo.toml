@@ -16,4 +16,4 @@ keywords = ["iron", "web", "url", "encoding"]
 iron = "0.5"
 url = "1.2"
 plugin = "0.2"
-bodyparser = "0.5"
+bodyparser = "0.6"

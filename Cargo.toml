@@ -1,5 +1,4 @@
 [package]
-
 name = "urlencoded"
 version = "0.5.0"
 authors = ["Patrick Tran <patrick.tran06@gmail.com>",
@@ -16,4 +15,4 @@ keywords = ["iron", "web", "url", "encoding"]
 iron = "0.5"
 url = "1.2"
 plugin = "0.2"
-bodyparser = "0.6"
+bodyparser = "0.7"
